@@ -1,0 +1,471 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    padding: 0;
+    background-image: url("/static/teams.png");
+    background-size: cover;      /* rozciaga obraz na cala szerokosc i wysokosc */
+    background-position: center; /* centruje obraz */
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* opcjonalnie: tlo nie przewija sie z zawartoscia */
+}
+
+/* Wysrodkowanie calego setupa na ekranie */
+#setup {
+    position: fixed;           /* zeby byl zawsze na srodku viewportu */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.85);
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    width: 320px;
+    box-sizing: border-box;
+    text-align: center;       /* zeby tekst i elementy byly wysrodkowane */
+}
+
+/* Form w pionowej kolumnie, inputy i przycisk pod soba */
+#teamForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;  /* odstep miedzy polami i przyciskiem */
+}
+
+#teamForm input {
+    padding: 10px 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+#teamForm button {
+    margin-top: 10px;
+    padding: 12px;
+    font-size: 18px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+}
+
+#teamForm button:hover {
+    background-color: #0056b3;
+}
+
+
+/* Kontener gry jako grid 2x2 z odstepami */
+#game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: block; /* wylacz grid */
+    padding: 0;
+}
+
+/* Boxy druzyn pozycjonujemy absolutnie w rogach */
+.team {
+    position: absolute;
+    width: 40%;
+	height: 30%;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Pozycje w rogach */
+#team1 {
+    top: 20px;
+    left: 20px;
+}
+
+#team2 {
+    top: 20px;
+    right: 20px;
+}
+
+#team3 {
+    bottom: 20px;
+    left: 20px;
+}
+
+#team4 {
+    bottom: 20px;
+    right: 20px;
+}
+
+
+/* Nazwa druzyny i zegar na osobnym tle */
+.team h2 {
+    background-color: #007bff;  /* niebieskie tlo */
+    color: white;
+    width: 100%;
+    padding: 10px 0;
+    margin: 0 0 12px 0;
+    text-align: center;
+	justify-content: center; /* centrowanie poziome */
+    border-radius: 8px;
+    font-size: 1.5em;
+}
+
+/* Timer na tle lekko jasniejszym niz nazwa */
+.timer {
+    background-color: #3399ff;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    min-width: 100px;
+    text-align: center;
+}
+
+/* Styl pytania i innych elementow pozostaje jak wczesniej */
+.team p {
+    display: flex;
+    align-items: center;  /* centrowanie pionowe */
+    justify-content: center; /* centrowanie poziome */
+    flex-grow: 0;
+    font-size: 1.1em;
+    text-align: center;
+    margin: 0 0 20px 0;
+    padding: 0 10px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+
+/* Kontener przyciskow */
+.team .buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center; /* wysrodkowanie przyciskow */
+	width: 100%;
+}
+
+/* Styl przyciskow */
+.team .buttons button {
+    width: 100%;               
+    padding: 12px 0;
+    font-size: 1em;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Zielony przycisk dla poprawnej odpowiedzi */
+.team .buttons button:nth-child(1) {
+    background-color: #28a745; /* zielen */
+}
+
+.team .buttons button:nth-child(1):hover {
+    background-color: #218838;
+}
+
+/* Czerwony przycisk dla blednej odpowiedzi */
+.team .buttons button:nth-child(2) {
+    background-color: #dc3545; /* czerwien */
+}
+
+.team .buttons button:nth-child(2):hover {
+    background-color: #c82333;
+}
+
+
+.setup-form {
+    text-align: center;
+    padding: 20px;
+}
+
+.setup-form input {
+    margin: 5px;
+    padding: 10px;
+    width: 200px;
+}
+
+.setup-form button {
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* Tlo za modalem */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* Kontener modala */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    height: 320px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    padding: 20px 30px;
+    z-index: 1000;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    box-sizing: border-box;
+}
+
+/* Pytanie - wysrodkowane wewnatrz */
+.modal-question {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.2em;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+/* Przyciski nawigacji */
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.navigation-buttons button {
+    flex: 1;
+    padding: 10px 0;
+    font-size: 1em;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#prevBtn {
+    background-color: #007bff;
+    color: white;
+}
+
+#nextBtn {
+    background-color: #28a745;
+    color: white;
+}
+
+#prevBtn:hover {
+    background-color: #0056b3;
+}
+
+#nextBtn:hover {
+    background-color: #1e7e34;
+}
+
+/* Przycisk zamkniecia */
+.close-btn {
+    margin-top: 15px;
+    padding: 10px;
+    font-size: 1em;
+    font-weight: bold;
+    color: white;
+    background-color: #dc3545;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    background-color: #a71d2a;
+}
+
+#wrongAnswersModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 420px;
+    height: 320px;
+
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    padding: 20px 30px;
+
+    z-index: 1000;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    box-sizing: border-box;
+}
+
+#modalQuestionText {
+    flex-grow: 1;
+	height: 100px;
+    display: flex;
+    justify-content: center;   /* poziome centrowanie */
+    align-items: center;       /* pionowe centrowanie */
+    font-size: 1.2em;
+    text-align: center;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+/* Kontener przyciskow nawigacji */
+#wrongAnswersModal .navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Styl przyciskow */
+#wrongAnswersModal button {
+    padding: 10px 20px;
+    font-size: 1em;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex: 1;
+	height: 100%;
+}
+
+#prevBtn {
+    background-color: #007bff;
+    color: white;
+	width: 49%;
+}
+
+#prevBtn:hover {
+    background-color: #0056b3;
+}
+
+#nextBtn {
+    background-color: #28a745;
+    color: white;
+	width: 49%;
+}
+
+#nextBtn:hover {
+    background-color: #1e7e34;
+}
+
+/* Zamknij na samym dole */
+#closeModalBtn {
+    background-color: #dc3545;
+    color: white;
+    width: 99%;
+    margin-top: 15px;
+}
+
+#closeModalBtn:hover {
+    background-color: #a71d2a;
+}
+
+/* Backdrop */
+#modalBackdrop {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+}
+
+/* Styl naglowka wynikow */
+.results-title {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    color: #ffffff;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Karta wyniku */
+.score-card {
+    background-color: rgba(0, 0, 0, 0.65); /* polprzezroczyste tlo */
+    border-radius: 16px;
+    margin: 1.2rem auto;
+    padding: 1.2rem 2rem;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    color: #fff;
+    text-align: center;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.score-card:hover {
+    transform: scale(1.03);
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.team-name {
+    font-size: 1.8rem;
+    margin: 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.team-score {
+    font-size: 1.4rem;
+    margin-top: 0.5rem;
+    color: #f9d648;
+    font-weight: bold;
+}
+
+@keyframes flyToTeam3 {
+  0% {
+    left: -150px;
+    top: 50px;
+    transform: rotate(10deg);
+  }
+  80% {
+    top: 150px;
+    transform: rotate(0deg);
+  }
+  100% {
+    left: var(--target-left);
+    top: var(--target-top);
+    transform: rotate(-10deg);
+  }
+}
+
+#plane.animate {
+  animation: flyToTeam3 4s ease-in-out forwards;
+}

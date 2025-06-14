@@ -1,0 +1,23 @@
+Indicate rotating part that affect on tip clearance in the compressor; 2
+Indicate the compressor parts that protect the blades from radial movement; 1
+Indicate the part that prevents engine stall and is not mounted on the engine frame; 1
+Indicate the spacers for igniter plugs; 1
+Indicate the place on the part where air is supplied for afterburning purposes; 2
+Indicate the part that have characteristic fir-tree and airfoil shaped elements; 2
+Indicate the part common to both the compressor module and the turbine module; 1
+Indicate high pressure turbine parts whose installation method is based on tight-fit; 1
+Indicate the part from compressor that has Nickiel as the base material; 1
+Indicate turbine part used for vibration reduction that do not have airfoil profiles; 1
+Indicate the part that enables oil supply to the bearing compartments; 1
+Indicate the engine mount; 2
+Indicate the place where ball bearing are installed. The module is not installed on the engine suspended on the FOS; 1
+Show on the cross-section the tapered bearing; 2
+Indicate the part that transfers torque from the main gearbox MGB to the high-pressure shaft N2; 2
+Indicate the engine inlet cowl; 1
+What type of fuel nozzles are located at 10 oclock on the engine positioned on the FOS?; 2
+Indicate the part responsible for oil cooling; 1
+Indicate the part responsible for generating spark; 3
+Indicate part from FADEC system with SN XXX and provide its full name; 7
+Indicate the part that verifies the engine condition by sensor with piezoelectric element; 2
+Indicate the part that allows verification of oil leakage. Provide its full name; 2
+Show on the cross-section the third stage vane of the turbine; 1

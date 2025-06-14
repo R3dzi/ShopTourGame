@@ -1,0 +1,23 @@
+Iindicate the part that contains splines from cold section; 1
+Indicate LLP from high pressure compressor; 2
+Indicate the compressor rotating part whose installation method is based on tight fit; 1
+Indicate the seats for igniter plugs; 1
+Indicate all parts necessary to maintain the flame in the combustion chamber; 2
+Indicate two parts that affect on tip clearance in the turbine; 2
+Indicate the turbine parts that protect the blades from axial movement; 1
+Indicate low-pressure turbine parts that contain ceramic coating; 1
+Indicate the part from compressor that has Titanium as the base material; 1
+What is the function of the module whose case is cooled by the active method?; 1
+Indicate the part that enables oil supply to the bearing compartments; 1
+Indicate the pylon; 2
+Indicate the rear carbon seal on the module which is not installed on the engine suspunded on the FOS; 2
+Show on the cross-section the bearing which carry axial loads from N2 system; 2
+Provide the part number PN of the part responsible for generating power for the FADEC operation; 2
+Indicate the engine exhaust cone; 1
+Indicate the part responsible for fuel cooling with SN XXX; 6
+Indicate the part that stores oil and it is not installed on the engine suspended on the FOS; 2
+Indicate the part responsible for creating energy delivered to igniter plugs; 3
+Indicate the EEC channel that acts as Master; 1
+Indicate the part that in an emergency situation assumes the fail-save position; 2
+Indicate the part that allows verification of bearing condition without disassembly. Provide its full name; 2
+Show on the cross-section the third stage rotor of the compressor; 1

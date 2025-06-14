@@ -1,0 +1,23 @@
+Indicate the part that have characteristic dove-tail and not airfoil shaped elements; 1
+Indicate the compressor parts that protect the blades from axial movement; 1
+Indicate the part belonging to the compressor system and distributed to reduce vibrations. This part has SN LBDUAR5618; 7
+Indicate non-rotating LLP; 2
+Indicate the place on the part where fuel is supplied for burning purposes; 2
+Indicate static part that affect on tip clearance in the turbine; 2
+Indicate the part that transfer torque from hot section; 1
+Indicate the parts which use cooling air to maintain tip clearance; 1
+What is the function of the module whose pick-up air is used for anti-ice purposes?; 1
+Indicate the part from turbine that has Nickiel as the base material; 1
+Indicate the part that enables oil supply to the bearing compartments; 1
+What part is installed on right hand side of the MGB on the engine positioned on the FOS?; 2
+Indicate the front carbon seal on the module which is not installed on the engine suspunded on the FOS; 2
+Show on the cross-section the roller bearing; 2
+Indicate the module that drives engine accessories; 1
+Indicate the engine thrust reverser; 1
+Indicate the part which supply fuel remained in ecology tank; 2
+Indicate the part that scavenge oil from the system to the oil tank; 1
+What is the function of the part located at 7 oclock on the Fan Case of the engine suspended on the FOS, with PN 1018327?; 2
+What is the function of the part located at 9 oclock on the Fan Case of the engine hanging on the FOS, with PN 1015691-5-003?; 2
+Indicate the part that verifies the engine condition out of the airflow channel; 2
+Indicate the part that allows verification of oil temperature. Provide its full name; 2
+Show on the cross-section the third stage rotor of the high pressure turbine; 1

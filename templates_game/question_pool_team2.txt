@@ -1,0 +1,23 @@
+Indicate two parts that affect on tip clearance in the compressor; 2
+Indicate LLP from low pressure compressor; 2
+Indicate the compressor rotating part whose installation method is based on mouting bolts and nuts; 1
+Indicate parts that contain additional coatings for protection of the base material; 1
+Indicate the place on the part where air is provided for burning purposes; 2
+Iindicate the part that contains splines from hot section; 2
+Indicate the turbine part that protect the blades from radial movement; 1
+Indicate low-pressure turbine parts that protect blades from axial movement; 1
+What is the function of the module whose pick-up air is used for aircraft purposes?; 1
+Indicate the part from turbine that has Titanium as the base material; 1
+Indicate the part that prevents engine stall and is mounted on the engine frame; 1
+Indicate the place where engine mount could be installed; 2
+Indicate the place where roller bearing carry loads from N1 system. The module is installed on the engine suspended on the FOS; 2
+Show on the cross-section the ball bearing; 2
+Provide the part number of the part responsible for generating power for the aircarft operation; 6
+Indicate the engine inlet cone; 1
+Indicate the part responsible for fuel heating; 1
+Indicate the part that supply oil from the tank to the system; 2
+Indicate the part responsible for transfer energy delivered to igniter plugs; 3
+Indicate the EEC channel that acts as stand-by; 1
+Indicate the part that verifies the engine condition by temperature; 2
+Indicate the part that allows verification of oil condition without draining. Provide its full name; 2
+Show on the cross-section the third stage vane of the high pressure compressor; 1

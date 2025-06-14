@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Shop Tour Game</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="setup" class="setup-form fade-in">
+        <h2>Teams</h2>
+        <form id="teamForm">
+            <input type="text" name="team1" placeholder="Team #1" required>
+            <input type="text" name="team2" placeholder="Team #2" required>
+            <input type="text" name="team3" placeholder="Team #3" required>
+            <input type="text" name="team4" placeholder="Team #4" required>
+            <button type="submit">Start</button>
+        </form>
+    </div>
+
+    <div class="container fade-in" id="game" style="display:none;">
+        <div class="team" id="team1"></div>
+        <div class="team" id="team2"></div>
+        <div class="team" id="team3"></div>
+        <div class="team" id="team4"></div>
+    </div>
+	
+    <script>
+        // Stan druzyn
+		
+		let team3QuestionsCount = 0;
+		let team3AnswersCount = 0;
+		let planeLanded = false;
+
+		const teamNames = {};
+        const teamStates = {
+            team1: { hasAnswered: false, hasMoreQuestions: true },
+            team2: { hasAnswered: false, hasMoreQuestions: true },
+            team3: { hasAnswered: false, hasMoreQuestions: true },
+            team4: { hasAnswered: false, hasMoreQuestions: true },
+        };
+        // Obiekt do przechowywania czasu rozpoczecia pytania dla kazdej druzyny
+		const questionStartTimes = {
+			team1: null,
+			team2: null,
+			team3: null,
+			team4: null
+		};
+        // Obsluga formularza dla nazw druzyn
+        document.getElementById('teamForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                team1: form.team1.value,
+                team2: form.team2.value,
+                team3: form.team3.value,
+                team4: form.team4.value
+            };
+
+            // Wysylanie nazw druzyn do backendu
+            await fetch('/set_team_names', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+			// ? Zmiana tla po rozpoczeciu gry
+			document.body.style.backgroundImage = "url('/static/game_background.png')";
+	
+            // Ukrywanie formularza i pokazanie gry
+            document.getElementById('setup').style.display = 'none';
+            document.getElementById('game').style.display = 'grid';
+            loadQuestions();
+        });
+
+        // Ladowanie pytan dla druzyn
+        async function loadQuestions() {
+            const res = await fetch('/get_questions');
+            const data = await res.json();
+
+            // Iteracja po druzynach
+            for (const team in data.questions) {
+                const questions = data.questions[team];
+                const teamName = data.names[team];
+
+                if (questions.length > 0) {
+                    // Renderowanie pierwszego pytania
+                    renderQuestion(team, questions[0], teamName);
+                } else {
+                    // Brak pytan na start
+                    showNoMoreQuestions(team);
+                }
+            }
+        }
+
+        // Renderowanie pytania dla druzyny
+		function renderQuestion(teamId, question, teamName) {
+			questionStartTimes[teamId] = Date.now();  // Start czasu
+			
+			const container = document.getElementById(teamId);
+			container.innerHTML = `
+				<h2>${teamName}</h2>
+				<div class="timer" id="${teamId}-timer">Czas: 0s</div>
+				<p>${question.text}</p>
+				<div class="buttons">
+					<button onclick="handleAnswer('${teamId}', true)">Correct</button>
+					<button onclick="handleAnswer('${teamId}', false)">Wrong</button>
+				</div>
+			`;
+
+			startTimer(teamId);
+		}
+
+        // Wyswietlanie wynikow koncowych
+		function showFinalResults(results) {
+			const container = document.getElementById('game');
+			container.innerHTML = '<h1 class="results-title">Questions with wrong answers</h1>';
+
+			const allWrongQuestions = [];
+
+			// Zbieranie wszystkich blednych pytan
+			for (const team in results) {
+				const wrongs = results[team].wrong_questions || [];
+				for (const q of wrongs) {
+					if (q.text && !allWrongQuestions.find(existing => existing.text === q.text)) {
+						allWrongQuestions.push(q);
+					}
+				}
+			}
+
+			// Modal elements (zakladam, ze masz je w HTML)
+			const modal = document.getElementById('wrongAnswersModal');
+			const backdrop = document.getElementById('modalBackdrop');
+			const modalQuestionText = document.getElementById('modalQuestionText');
+			const prevBtn = document.getElementById('prevBtn');
+			const nextBtn = document.getElementById('nextBtn');
+			const closeModalBtn = document.getElementById('closeModalBtn');
+
+			let currentIndex = 0;
+
+			function updateModal() {
+				modalQuestionText.textContent = allWrongQuestions[currentIndex].text;
+				prevBtn.disabled = currentIndex === 0;
+				nextBtn.disabled = currentIndex === allWrongQuestions.length - 1;
+			}
+
+			// Jesli brak blednych odpowiedzi
+			if (allWrongQuestions.length === 0) {
+				container.innerHTML += '<p><em>All answers are corret!</em></p>';
+
+				const button = document.createElement('button');
+				button.textContent = 'Show results';
+				button.onclick = () => showScores(results, teamNames);
+				container.appendChild(button);
+				return;
+			}
+
+			// Jesli sa bledne odpowiedzi, to pokazujemy od razu modal
+			currentIndex = 0;
+			updateModal();
+			modal.style.display = 'block';
+			backdrop.style.display = 'block';
+
+			// Obsluga przyciskow modala
+			prevBtn.onclick = () => {
+				if (currentIndex > 0) {
+					currentIndex--;
+					updateModal();
+				}
+			};
+
+			nextBtn.onclick = () => {
+				if (currentIndex < allWrongQuestions.length - 1) {
+					currentIndex++;
+					updateModal();
+				}
+			};
+
+			closeModalBtn.onclick = () => {
+				// animacja znika modala
+				modal.classList.add('fade-out');
+				backdrop.classList.add('fade-out');
+
+				setTimeout(() => {
+					modal.style.display = 'none';
+					backdrop.style.display = 'none';
+					modal.classList.remove('fade-out');
+					backdrop.classList.remove('fade-out');
+
+					// teraz robimy fade-out kontenera wynikow
+					const container = document.getElementById('game');
+					container.classList.remove('fade-in');
+					container.classList.add('fade-out');
+
+					setTimeout(() => {
+						// faktyczne wywolanie wynikow
+						container.classList.remove('fade-out');
+						showScores(results, teamNames);
+
+						// po zaladowaniu wynikow dajemy fade-in
+						container.classList.add('fade-in');
+					}, 500); // dopasuj do czasu animacji
+				}, 500); // czas trwania fade-out modala
+			};
+
+
+			backdrop.onclick = () => {
+				closeModalBtn.onclick(); // delegujemy do tej samej funkcji
+			};
+
+		}
+			
+        // Pokazywanie wynikow
+		function showScores(results) {
+			const container = document.getElementById('game');
+			container.innerHTML = '<h1 class="results-title">Results:</h1>';
+			document.body.style.backgroundImage = "url('/static/results.png')";
+
+			const sortedResults = Object.entries(results).sort((a, b) => b[1].score - a[1].score);
+
+			for (const [teamId, data] of sortedResults) {
+				const name = data.teamName || teamId.toUpperCase();
+				container.innerHTML += `
+					<div class="score-card">
+						<h2 class="team-name">${name.toUpperCase()}</h2>
+						<p class="team-score">${data.score} points</p>
+					</div>`;
+			}
+		}
+
+        // Przechodzenie do kolejnego pytania
+		async function nextQuestion(teamId) {
+			const res = await fetch(`/next_question/${teamId}`, { method: 'POST' });
+			const data = await res.json();
+
+			if (data.finished) {
+				// Gra sie skonczyla - pobierz wyniki
+				const resultsRes = await fetch('/game_results');
+				const results = await resultsRes.json();
+
+				showScores(results, teamNames); // <-- przekazujemy teamNames!
+			} else {
+				// Pobierz nazwe druzyny z DOM i zapisz do obiektu
+				const teamName = document.querySelector(`#${teamId} h2`).innerText;
+				teamNames[teamId] = teamName;
+
+				renderQuestion(teamId, data.question, teamName);
+			}
+		}
+
+
+        // Obsluga odpowiedzi druzyny
+		async function handleAnswer(teamId, isCorrect) {
+			// Zatrzymaj timer
+			if (timers[teamId]) {
+				clearInterval(timers[teamId]);
+				timers[teamId] = null;
+			}
+			const now = Date.now();
+			const start = questionStartTimes[teamId];
+			const timeTakenSeconds = start ? (now - start) / 1000 : null;
+
+			const payload = { correct: isCorrect };
+			if (timeTakenSeconds !== null) {
+				payload.time_taken = timeTakenSeconds;  // Wysylamy czas odpowiedzi w sekundach
+			}
+
+			const res = await fetch(`/answer/${teamId}`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			});
+
+			const data = await res.json();
+
+			// Reset czasu startu, bo pytanie jest zakonczone
+			questionStartTimes[teamId] = null;
+
+			// Zaktualizowanie stanu druzyny
+			teamStates[teamId].hasAnswered = true;
+			teamStates[teamId].hasMoreQuestions = !data.finished;
+
+			checkIfGameShouldEnd();
+
+			// Przechodzenie do kolejnego pytania lub brak pytan
+			if (!data.finished && data.question) {
+				const teamName = document.querySelector(`#${teamId} h2`).innerText;
+				renderQuestion(teamId, data.question, teamName);
+				teamStates[teamId].hasAnswered = false;
+			} else {
+				showNoMoreQuestions(teamId);
+			}
+		}
+
+
+        // Sprawdzanie, czy gra powinna sie zakonczyc
+        async function checkIfGameShouldEnd() {
+            const allDone = Object.values(teamStates).every(state =>
+                state.hasAnswered && !state.hasMoreQuestions
+            );
+
+            if (allDone) {
+                const resultsRes = await fetch('/game_results');
+                const results = await resultsRes.json();
+                showFinalResults(results);
+            }
+        }
+
+        // Pokazywanie komunikatu o braku pytan
+        function showNoMoreQuestions(teamId) {
+            const container = document.getElementById(teamId);
+            const teamName = document.querySelector(`#${teamId} h2`)?.innerText || '';
+            container.innerHTML = `
+                <h2>${teamName}</h2>
+                <p><em>No more question</em></p>
+            `;
+        }
+		
+		const timers = {};  // Przechowuje ID setInterval dla kazdego teamu
+
+		function startTimer(teamId) {
+			// Jesli juz jest timer dla druzyny, wyczysc go
+			if (timers[teamId]) {
+				clearInterval(timers[teamId]);
+			}
+
+			const timerElem = document.getElementById(`${teamId}-timer`);
+			let seconds = 0;
+
+			timers[teamId] = setInterval(() => {
+				seconds++;
+				if (timerElem) {
+					timerElem.textContent = `Time: ${seconds}s`;
+				}
+			}, 1000);
+		}
+
+		function flyPlaneToTeam3() {
+			const plane = document.getElementById('plane');
+			const target = document.getElementById('team3');
+
+			if (!plane || !target) return;
+
+			// Pokaz samolot na starcie po lewej stronie
+			plane.style.display = 'block';
+			plane.style.left = '-150px';
+			plane.style.top = '50px';
+			plane.classList.remove('animate');
+
+			// Oblicz wspolrzedne celu (team3)
+			const rect = target.getBoundingClientRect();
+			const offsetX = window.scrollX + rect.left + rect.width / 2 - 50;
+			const offsetY = window.scrollY + rect.top - 20;
+
+			// Ustaw wspolrzedne CSS jako zmienne
+			plane.style.setProperty('--target-left', `${offsetX}px`);
+			plane.style.setProperty('--target-top', `${offsetY}px`);
+
+			// Uruchom animacje po krotkim opoznieniu, by CSS mial czas zareagowac
+			setTimeout(() => {
+				plane.classList.add('animate');
+			}, 50);
+
+			// Schowaj samolot po animacji
+			setTimeout(() => {
+				plane.style.display = 'none';
+				plane.classList.remove('animate');
+			}, 4500);
+		}
+
+		// Co jakis czas (np. co 30 sekund) samolot przelatuje
+		setInterval(() => {
+			if (document.getElementById('game').style.display !== 'none') {
+				flyPlaneToTeam3();
+			}
+		}, 30000); // 30 sekund
+
+    </script>
+
+<div id="wrongAnswersModal" style="display:none; position:fixed; top:50%; left:50%; transform: translate(-50%, -50%);
+    background:white; border:1px solid #ccc; padding:20px; max-width: 800px; width: 100%; z-index: 1000; flex-direction: column; justify-content: space-between; height: 300px;">
+    <div id="modalQuestionText" style="flex-grow: 1;"></div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <button id="prevBtn">Back</button>
+        <button id="nextBtn">Next</button>
+    </div>
+
+    <div style="text-align: center; margin-top: 15px;">
+        <button id="closeModalBtn">Close</button>
+    </div>
+</div>
+
+<div id="modalBackdrop" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5); z-index: 999;"></div>
+
+</body>
+</html>
